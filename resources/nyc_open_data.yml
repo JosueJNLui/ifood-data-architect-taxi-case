@@ -1,0 +1,23 @@
+resources:
+
+  jobs:
+    ingest_nyc_opendata:
+      name: Job to Ingest Data from API into Bronze Layer
+
+      tasks:
+
+        - task_key: green_tripdata_ingestion
+          notebook_task:
+            notebook_path: ../src/ingest_data_from_api.ipynb
+
+            base_parameters:
+              env: 'dev'
+              source_data: 'green_tripdata'
+
+        - task_key: yellow_tripdata_ingestion
+          notebook_task:
+            notebook_path: ../src/ingest_data_from_api.ipynb
+
+            base_parameters:
+              env: 'dev'
+              source_data: 'yellow_tripdata'
