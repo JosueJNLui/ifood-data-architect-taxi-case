@@ -7,12 +7,20 @@ resources:
       tasks:
 
         - task_key: green_tripdata_ingestion
+          depends_on: 
+            - task_key: short_pause_for_concurrency
           notebook_task:
             notebook_path: ../src/ingest_data_from_api.ipynb
 
             base_parameters:
               env: 'dev'
               source_data: 'green_tripdata'
+        
+        - task_key: short_pause_for_concurrency
+          notebook_task:
+            notebook_path: ../src/delay_timer.ipynb
+            base_parameters:
+              delay_seconds: 120
 
         - task_key: yellow_tripdata_ingestion
           notebook_task:
