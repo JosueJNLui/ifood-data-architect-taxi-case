@@ -1,0 +1,799 @@
+{
+  "datasets": [
+    {
+      "name": "4022e55f",
+      "displayName": "widget_taxi_type",
+      "queryLines": [
+        "SELECT\n",
+        "  *\n",
+        "FROM \n",
+        "  (VALUES \n",
+        "  ('yellow')\n",
+        "  , ('green')\n",
+        "  , ('all')\n",
+        "  ) AS (taxi_type) \n"
+      ]
+    },
+    {
+      "name": "dc2712a2",
+      "displayName": "big_number_total_rides",
+      "queryLines": [
+        "SELECT\n",
+        "  COUNT(*) total_rides\n",
+        "FROM \n",
+        "  main.silver.nyc_tripdata_silver\n",
+        "WHERE TRUE \n",
+        "  AND \n",
+        "    CASE\n",
+        "      WHEN :taxi_type = 'all' THEN TRUE\n",
+        "      ELSE :taxi_type = taxi_type\n",
+        "    END \n",
+        "  AND DATE(date_partition) BETWEEN :period.min AND :period.max\n",
+        "  "
+      ],
+      "parameters": [
+        {
+          "displayName": "taxi_type",
+          "keyword": "taxi_type",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "all"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "period",
+          "keyword": "period",
+          "dataType": "DATE",
+          "complexType": "RANGE",
+          "defaultSelection": {
+            "range": {
+              "dataType": "DATE",
+              "min": {
+                "value": "2023-03-01T00:00:00.000"
+              },
+              "max": {
+                "value": "2023-03-03T23:59:59.999"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "57b5e3ce",
+      "displayName": "big_number_total_amount",
+      "queryLines": [
+        "SELECT\n",
+        "  SUM(total_amount) total_amount\n",
+        "FROM \n",
+        "  main.silver.nyc_tripdata_silver\n",
+        "WHERE TRUE \n",
+        "  AND \n",
+        "    CASE\n",
+        "      WHEN :taxi_type = 'all' THEN TRUE\n",
+        "      ELSE :taxi_type = taxi_type\n",
+        "    END \n",
+        "  AND DATE(date_partition) BETWEEN :period.min AND :period.max\n",
+        "  "
+      ],
+      "parameters": [
+        {
+          "displayName": "taxi_type",
+          "keyword": "taxi_type",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "all"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "period",
+          "keyword": "period",
+          "dataType": "DATE",
+          "complexType": "RANGE",
+          "defaultSelection": {
+            "range": {
+              "dataType": "DATE",
+              "min": {
+                "value": "2023-03-01T00:00:00.000"
+              },
+              "max": {
+                "value": "2023-03-03T23:59:59.999"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5014ce76",
+      "displayName": "line_chart_monthly_rides",
+      "queryLines": [
+        "SELECT\n",
+        "   DATE_TRUNC('MONTH', date_partition) month\n",
+        "  , taxi_type\n",
+        "  , COUNT(*) total_rides\n",
+        "FROM \n",
+        "  main.silver.nyc_tripdata_silver\n",
+        "WHERE TRUE \n",
+        "  AND \n",
+        "    CASE\n",
+        "      WHEN :taxi_type = 'all' THEN TRUE\n",
+        "      ELSE :taxi_type = taxi_type\n",
+        "    END \n",
+        "  AND DATE(date_partition) BETWEEN :period.min AND :period.max\n",
+        "  GROUP BY ALL"
+      ],
+      "parameters": [
+        {
+          "displayName": "taxi_type",
+          "keyword": "taxi_type",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "all"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "period",
+          "keyword": "period",
+          "dataType": "DATE",
+          "complexType": "RANGE",
+          "defaultSelection": {
+            "range": {
+              "dataType": "DATE",
+              "min": {
+                "value": "2023-03-01T00:00:00.000"
+              },
+              "max": {
+                "value": "2023-03-03T23:59:59.999"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1109c726",
+      "displayName": "big_number_average_total_amount_per_month",
+      "queryLines": [
+        "SELECT\n",
+        "  AVG(total_amount) avg_total_amount\n",
+        "FROM\n",
+        "(\n",
+        "  SELECT\n",
+        "    DATE_TRUNC('MONTH', date_partition) month\n",
+        "    , SUM(total_amount) total_amount\n",
+        "  FROM \n",
+        "    main.silver.nyc_tripdata_silver\n",
+        "  WHERE TRUE \n",
+        "    AND \n",
+        "      CASE\n",
+        "        WHEN :taxi_type = 'all' THEN TRUE\n",
+        "        ELSE :taxi_type = taxi_type\n",
+        "      END \n",
+        "    AND DATE(date_partition) BETWEEN :period.min AND :period.max\n",
+        "    GROUP BY ALL\n",
+        "  )"
+      ],
+      "parameters": [
+        {
+          "displayName": "taxi_type",
+          "keyword": "taxi_type",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "all"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "period",
+          "keyword": "period",
+          "dataType": "DATE",
+          "complexType": "RANGE",
+          "defaultSelection": {
+            "range": {
+              "dataType": "DATE",
+              "min": {
+                "value": "2023-03-01T00:00:00.000"
+              },
+              "max": {
+                "value": "2023-03-03T23:59:59.999"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "007a9e08",
+      "displayName": "line_chart_average_total_passenger_per_hour",
+      "queryLines": [
+        "SELECT\n",
+        "   HOUR(pickup_datetime) hour\n",
+        "  , AVG(passenger_count) avg_pass_count\n",
+        "FROM \n",
+        "  main.silver.nyc_tripdata_silver\n",
+        "WHERE TRUE \n",
+        "  AND \n",
+        "    CASE\n",
+        "      WHEN :taxi_type = 'all' THEN TRUE\n",
+        "      ELSE :taxi_type = taxi_type\n",
+        "    END \n",
+        "  AND DATE(date_partition) BETWEEN :period.min AND :period.max\n",
+        "  GROUP BY ALL\n",
+        "  ORDER BY 1 ASC"
+      ],
+      "parameters": [
+        {
+          "displayName": "taxi_type",
+          "keyword": "taxi_type",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "all"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "period",
+          "keyword": "period",
+          "dataType": "DATE",
+          "complexType": "RANGE",
+          "defaultSelection": {
+            "range": {
+              "dataType": "DATE",
+              "min": {
+                "value": "2023-03-01T00:00:00.000"
+              },
+              "max": {
+                "value": "2023-03-03T23:59:59.999"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "307cdadf",
+      "displayName": "nyc_data",
+      "layout": [
+        {
+          "widget": {
+            "name": "0cafaa86",
+            "queries": [
+              {
+                "name": "dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9ae6911c05a2af9db905eccb79_taxi_type",
+                "query": {
+                  "datasetName": "4022e55f",
+                  "fields": [
+                    {
+                      "name": "taxi_type",
+                      "expression": "`taxi_type`"
+                    },
+                    {
+                      "name": "taxi_type_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9b43491f2d9325d9a40dbb7bb0_taxi_type",
+                "query": {
+                  "datasetName": "dc2712a2",
+                  "parameters": [
+                    {
+                      "name": "taxi_type",
+                      "keyword": "taxi_type"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9bd0c7105c9a20e4a21ca2b8ab_taxi_type",
+                "query": {
+                  "datasetName": "57b5e3ce",
+                  "parameters": [
+                    {
+                      "name": "taxi_type",
+                      "keyword": "taxi_type"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9c1e0a1eacb2cb902ffd25ef69_taxi_type",
+                "query": {
+                  "datasetName": "5014ce76",
+                  "parameters": [
+                    {
+                      "name": "taxi_type",
+                      "keyword": "taxi_type"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "taxi_type",
+                    "queryName": "dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9ae6911c05a2af9db905eccb79_taxi_type"
+                  },
+                  {
+                    "parameterName": "taxi_type",
+                    "queryName": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9b43491f2d9325d9a40dbb7bb0_taxi_type"
+                  },
+                  {
+                    "parameterName": "taxi_type",
+                    "queryName": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9bd0c7105c9a20e4a21ca2b8ab_taxi_type"
+                  },
+                  {
+                    "parameterName": "taxi_type",
+                    "queryName": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9c1e0a1eacb2cb902ffd25ef69_taxi_type"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Taxi Type"
+              },
+              "disallowAll": true,
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "all"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "36a155b1",
+            "queries": [
+              {
+                "name": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9b43491f2d9325d9a40dbb7bb0_period",
+                "query": {
+                  "datasetName": "dc2712a2",
+                  "parameters": [
+                    {
+                      "name": "period",
+                      "keyword": "period"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9bd0c7105c9a20e4a21ca2b8ab_period",
+                "query": {
+                  "datasetName": "57b5e3ce",
+                  "parameters": [
+                    {
+                      "name": "period",
+                      "keyword": "period"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9c1e0a1eacb2cb902ffd25ef69_period",
+                "query": {
+                  "datasetName": "5014ce76",
+                  "parameters": [
+                    {
+                      "name": "period",
+                      "keyword": "period"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9d44271764b2e9a75ee637d881_period",
+                "query": {
+                  "datasetName": "1109c726",
+                  "parameters": [
+                    {
+                      "name": "period",
+                      "keyword": "period"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "parameterName": "period",
+                    "queryName": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9b43491f2d9325d9a40dbb7bb0_period"
+                  },
+                  {
+                    "parameterName": "period",
+                    "queryName": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9bd0c7105c9a20e4a21ca2b8ab_period"
+                  },
+                  {
+                    "parameterName": "period",
+                    "queryName": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9c1e0a1eacb2cb902ffd25ef69_period"
+                  },
+                  {
+                    "parameterName": "period",
+                    "queryName": "parameter_dashboards/01f0af9ac6e31b4a9140a07d3e798859/datasets/01f0af9d44271764b2e9a75ee637d881_period"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Date Period"
+              },
+              "selection": {
+                "defaultSelection": {
+                  "range": {
+                    "dataType": "DATE",
+                    "min": {
+                      "value": "2023-01-01T00:00:00.000"
+                    },
+                    "max": {
+                      "value": "2023-05-31T23:59:59.999"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "77e1e20c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dc2712a2",
+                  "fields": [
+                    {
+                      "name": "total_rides",
+                      "expression": "`total_rides`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "total_rides"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total rides"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "52f95a0c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "57b5e3ce",
+                  "fields": [
+                    {
+                      "name": "total_amount",
+                      "expression": "`total_amount`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "total_amount",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total amount"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "3294c4b2",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "5014ce76",
+                  "fields": [
+                    {
+                      "name": "taxi_type",
+                      "expression": "`taxi_type`"
+                    },
+                    {
+                      "name": "monthly(month)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `month`)"
+                    },
+                    {
+                      "name": "total_rides",
+                      "expression": "`total_rides`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(month)",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "total_rides",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "displayName": "total_rides"
+                },
+                "color": {
+                  "fieldName": "taxi_type",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "green",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Monthly rides "
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "22baf399",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1109c726",
+                  "fields": [
+                    {
+                      "name": "avg_total_amount",
+                      "expression": "`avg_total_amount`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg_total_amount"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Average Total amount per Month"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 1,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "4a56710c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "007a9e08",
+                  "fields": [
+                    {
+                      "name": "hour",
+                      "expression": "`hour`"
+                    },
+                    {
+                      "name": "avg_pass_count",
+                      "expression": "`avg_pass_count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "hour",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg_pass_count",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "displayName": "avg_pass_count"
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Hourly Average Passenger Count"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 6,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "be5bab5d",
+      "displayName": "Global Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "genieSpace": {
+      "isEnabled": false
+    }
+  }
+}
