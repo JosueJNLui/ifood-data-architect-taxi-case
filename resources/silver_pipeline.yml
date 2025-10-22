@@ -1,0 +1,10 @@
+resources:
+  pipelines:
+    dlt_silver_pipeline:
+      name: dlt_silver_pipeline
+      catalog: main
+      schema: silver
+      serverless: true
+      libraries:
+        - notebook:
+            path: ../src/silver_pipeline.ipynb

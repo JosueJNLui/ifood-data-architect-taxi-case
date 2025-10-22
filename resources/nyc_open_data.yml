@@ -11,7 +11,6 @@ resources:
             - task_key: short_pause_for_concurrency
           notebook_task:
             notebook_path: ../src/ingest_data_from_api.ipynb
-
             base_parameters:
               env: 'dev'
               source_data: 'green_tripdata'
@@ -25,7 +24,6 @@ resources:
         - task_key: yellow_tripdata_ingestion
           notebook_task:
             notebook_path: ../src/ingest_data_from_api.ipynb
-
             base_parameters:
               env: 'dev'
               source_data: 'yellow_tripdata'
